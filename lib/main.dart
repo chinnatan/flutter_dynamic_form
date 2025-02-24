@@ -69,14 +69,9 @@ class _DynamicFormBuilderState extends State<DynamicFormBuilder> {
   ) {
     return Row(
       children: [
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.only(right: 30.0), // กันที่ให้ปุ่มลบ
-            child: _buildWidgetType(data, parentList),
-          ),
-        ),
+        Expanded(child: _buildWidgetType(data, parentList)),
         IconButton(
-          icon: Icon(Icons.close, color: Colors.red),
+          icon: Icon(Icons.cancel, color: Colors.red),
           onPressed: () => removeWidget(data, parentList),
         ),
       ],
@@ -92,7 +87,7 @@ class _DynamicFormBuilderState extends State<DynamicFormBuilder> {
         return DynamicOutlineTextFieldWidget(label: data.label ?? '');
       case FormType.row:
         return _buildDropZone(
-          type: 'Row',
+          type: FormType.row.name,
           data: data,
           parentList: parentList,
           child: Row(
@@ -117,7 +112,9 @@ class _DynamicFormBuilderState extends State<DynamicFormBuilder> {
     return DragTarget<DynamicFormEntity>(
       onAcceptWithDetails: (details) {
         setState(() {
-          data.children.add(details.data);
+          if (data.type == FormType.row && data.children.length < 3) {
+            data.children.add(details.data);
+          }
         });
       },
       builder: (context, candidateData, rejectedData) {
@@ -135,14 +132,14 @@ class _DynamicFormBuilderState extends State<DynamicFormBuilder> {
             children: [
               Center(
                 child: Text(
-                  "วางตรงนี้ ($type)",
+                  "วางตรงนี้ ($type ใส่ได้สูงสุด 3 ตัว)",
                   style: TextStyle(
                     color: Colors.blue,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-              type == "Row"
+              type == FormType.row.name
                   ? Row(
                     mainAxisSize: MainAxisSize.min,
                     children:
