@@ -39,8 +39,6 @@ class DynamicFormBuilder extends StatefulWidget {
 }
 
 class _DynamicFormBuilderState extends State<DynamicFormBuilder> {
-  // List<Map<String, dynamic>> formWidgets = [];
-
   List<DynamicFormEntity> dynamicFormEntities = [];
 
   String exportToJson() {
@@ -94,7 +92,18 @@ class _DynamicFormBuilderState extends State<DynamicFormBuilder> {
           ),
         );
       case FormType.column:
-        return Container(); // Add appropriate widget here
+        return _buildDropZone(
+          type: FormType.column.name,
+          data: data,
+          parentList: parentList,
+          child: Column(
+            children: [
+              ...data.children.map<Widget>(
+                (child) => buildFormWidget(child, data.children),
+              ),
+            ],
+          ),
+        );
     }
   }
 
@@ -106,11 +115,15 @@ class _DynamicFormBuilderState extends State<DynamicFormBuilder> {
   }) {
     return DragTarget<DynamicFormEntity>(
       onAcceptWithDetails: (details) {
-        setState(() {
-          if (data.type == FormType.row && data.children.length < 3) {
-            data.children.add(details.data);
-          }
-        });
+        if (data.type == FormType.row && data.children.length < 3) {
+          context.read<DynamicFormBloc>().add(
+            AddChildWidgetEvent(data, details.data),
+          );
+        } else if (data.type == FormType.column) {
+          context.read<DynamicFormBloc>().add(
+            AddChildWidgetEvent(data, details.data),
+          );
+        }
       },
       builder: (context, candidateData, rejectedData) {
         return Container(
@@ -127,7 +140,9 @@ class _DynamicFormBuilderState extends State<DynamicFormBuilder> {
             children: [
               Center(
                 child: Text(
-                  "วางตรงนี้ ($type ใส่ได้สูงสุด 3 ตัว)",
+                  type == FormType.row.name
+                      ? "วางตรงนี้ ($type ใส่ได้สูงสุด 3 ตัว)"
+                      : "วางตรงนี้ ($type)",
                   style: TextStyle(
                     color: Colors.blue,
                     fontWeight: FontWeight.bold,
@@ -197,9 +212,7 @@ class _DynamicFormBuilderState extends State<DynamicFormBuilder> {
           padding: const EdgeInsets.all(8.0),
           child: Draggable<DynamicFormEntity>(
             data: data,
-            feedback: _draggingWidget(
-              data.label ?? FormType.outlineTextField.name,
-            ),
+            feedback: _draggingWidget(data.label ?? FormType.row.name),
             child: Container(
               width: MediaQuery.of(context).size.width,
               decoration: BoxDecoration(
@@ -214,9 +227,26 @@ class _DynamicFormBuilderState extends State<DynamicFormBuilder> {
           ),
         );
       case FormType.column:
-        break;
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Draggable<DynamicFormEntity>(
+            data: data,
+            feedback: _draggingWidget(data.label ?? FormType.column.name),
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.blue),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(children: [Text("Column")]),
+              ),
+            ),
+          ),
+        );
     }
-    return SizedBox.shrink();
+    // return SizedBox.shrink();
   }
 
   Widget _draggingWidget(String label) {
@@ -257,10 +287,13 @@ class _DynamicFormBuilderState extends State<DynamicFormBuilder> {
                       children: [],
                     ),
                   ),
-                  // _draggableButton("Dropdown"),
-                  // _draggableButton("Checkbox"),
-                  // _draggableButton("Row"),
-                  // _draggableButton("Column"),
+                  _draggableButton(
+                    DynamicFormEntity(
+                      id: UniqueKey().toString(),
+                      type: FormType.column,
+                      children: [],
+                    ),
+                  ),
                   ElevatedButton(
                     onPressed: () {
                       print(exportToJson());

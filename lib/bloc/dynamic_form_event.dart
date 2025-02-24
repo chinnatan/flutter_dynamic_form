@@ -8,6 +8,13 @@ class AddWidgetEvent extends DynamicFormEvent {
   AddWidgetEvent(this.newWidget);
 }
 
+class AddChildWidgetEvent extends DynamicFormEvent {
+  final DynamicFormEntity parentWidget;
+  final DynamicFormEntity newChildrenWidget;
+
+  AddChildWidgetEvent(this.parentWidget, this.newChildrenWidget);
+}
+
 class RemoveWidgetEvent extends DynamicFormEvent {
   final DynamicFormEntity removeWidget;
   List<DynamicFormEntity> listParentWidget;

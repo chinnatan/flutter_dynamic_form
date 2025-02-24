@@ -13,6 +13,11 @@ class DynamicFormBloc extends Bloc<DynamicFormEvent, DynamicFormState> {
       emit(AddedWidgetState());
     });
 
+    on<AddChildWidgetEvent>((event, emit) {
+      event.parentWidget.children.add(event.newChildrenWidget);
+      emit(AddedWidgetState());
+    });
+
     on<RemoveWidgetEvent>((event, emit) {
       event.listParentWidget.remove(event.removeWidget);
       emit(RemovedWidgetState());
