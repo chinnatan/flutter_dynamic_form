@@ -1,5 +1,9 @@
 import 'package:flutter_dynamic_form_poc/constants/constant.dart';
+import 'package:json_annotation/json_annotation.dart';
 
+part 'dynamic_form_entity.g.dart';
+
+@JsonSerializable()
 class DynamicFormEntity {
   final String id;
   String? label;
@@ -12,4 +16,9 @@ class DynamicFormEntity {
     required this.type,
     required this.children,
   });
+
+  factory DynamicFormEntity.fromJson(Map<String, dynamic> json) =>
+      _$DynamicFormEntityFromJson(json);
+
+  Map<String, dynamic> toJson() => _$DynamicFormEntityToJson(this);
 }
