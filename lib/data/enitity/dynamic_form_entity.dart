@@ -5,10 +5,10 @@ part 'dynamic_form_entity.g.dart';
 
 @JsonSerializable()
 class DynamicFormEntity {
-  final String id;
+  String id;
   String? label;
   final FormType type;
-  List<DynamicFormEntity> children;
+  List<DynamicFormEntity> children = [];
 
   DynamicFormEntity({
     required this.id,

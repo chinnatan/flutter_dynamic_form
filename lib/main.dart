@@ -6,6 +6,7 @@ import 'package:flutter_dynamic_form_poc/bloc/dynamic_form_bloc.dart';
 import 'package:flutter_dynamic_form_poc/components/dynamic_outline_text_field.dart';
 import 'package:flutter_dynamic_form_poc/constants/constant.dart';
 import 'package:flutter_dynamic_form_poc/data/enitity/dynamic_form_entity.dart';
+import 'package:uuid/v4.dart';
 
 void main() {
   runApp(const MyApp());
@@ -104,6 +105,19 @@ class _DynamicFormBuilderState extends State<DynamicFormBuilder> {
             ],
           ),
         );
+      case FormType.space:
+        return _buildDropZone(
+          type: FormType.column.name,
+          data: data,
+          parentList: parentList,
+          child: Column(
+            children: [
+              ...data.children.map<Widget>(
+                (child) => buildFormWidget(child, data.children),
+              ),
+            ],
+          ),
+        );
     }
   }
 
@@ -116,13 +130,91 @@ class _DynamicFormBuilderState extends State<DynamicFormBuilder> {
     return DragTarget<DynamicFormEntity>(
       onAcceptWithDetails: (details) {
         if (data.type == FormType.row && data.children.length < 3) {
-          context.read<DynamicFormBloc>().add(
-            AddChildWidgetEvent(data, details.data),
-          );
+          if (details.data.type == FormType.outlineTextField) {
+            showDialog(
+              context: context,
+              builder: (context) {
+                final labelWidgetController = TextEditingController();
+                return AlertDialog(
+                  title: Text("ชื่อหัวข้อ"),
+                  content: TextField(
+                    controller: labelWidgetController,
+                    decoration: InputDecoration(border: OutlineInputBorder()),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Text("ยกเลิก"),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        final newWidget = DynamicFormEntity(
+                          id: UuidV4().generate(),
+                          label: labelWidgetController.text,
+                          type: details.data.type,
+                          children: [],
+                        );
+                        context.read<DynamicFormBloc>().add(
+                          AddChildWidgetEvent(data, newWidget),
+                        );
+                        Navigator.of(context).pop();
+                      },
+                      child: Text("ตกลง"),
+                    ),
+                  ],
+                );
+              },
+            );
+          } else {
+            context.read<DynamicFormBloc>().add(
+              AddChildWidgetEvent(data, details.data),
+            );
+          }
         } else if (data.type == FormType.column) {
-          context.read<DynamicFormBloc>().add(
-            AddChildWidgetEvent(data, details.data),
-          );
+          if (details.data.type == FormType.outlineTextField) {
+            showDialog(
+              context: context,
+              builder: (context) {
+                final labelWidgetController = TextEditingController();
+                return AlertDialog(
+                  title: Text("ชื่อหัวข้อ"),
+                  content: TextField(
+                    controller: labelWidgetController,
+                    decoration: InputDecoration(border: OutlineInputBorder()),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Text("ยกเลิก"),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        final newWidget = DynamicFormEntity(
+                          id: UuidV4().generate(),
+                          label: labelWidgetController.text,
+                          type: details.data.type,
+                          children: [],
+                        );
+                        context.read<DynamicFormBloc>().add(
+                          AddChildWidgetEvent(data, newWidget),
+                        );
+                        Navigator.of(context).pop();
+                      },
+                      child: Text("ตกลง"),
+                    ),
+                  ],
+                );
+              },
+            );
+          } else {
+            context.read<DynamicFormBloc>().add(
+              AddChildWidgetEvent(data, details.data),
+            );
+          }
         }
       },
       builder: (context, candidateData, rejectedData) {
@@ -245,6 +337,8 @@ class _DynamicFormBuilderState extends State<DynamicFormBuilder> {
             ),
           ),
         );
+      case FormType.space:
+        return SizedBox.shrink();
     }
     // return SizedBox.shrink();
   }
@@ -275,21 +369,21 @@ class _DynamicFormBuilderState extends State<DynamicFormBuilder> {
                 children: [
                   _draggableButton(
                     DynamicFormEntity(
-                      id: UniqueKey().toString(),
+                      id: UuidV4().generate(),
                       type: FormType.outlineTextField,
                       children: [],
                     ),
                   ),
                   _draggableButton(
                     DynamicFormEntity(
-                      id: UniqueKey().toString(),
+                      id: UuidV4().generate(),
                       type: FormType.row,
                       children: [],
                     ),
                   ),
                   _draggableButton(
                     DynamicFormEntity(
-                      id: UniqueKey().toString(),
+                      id: UuidV4().generate(),
                       type: FormType.column,
                       children: [],
                     ),
@@ -309,10 +403,50 @@ class _DynamicFormBuilderState extends State<DynamicFormBuilder> {
               flex: 2,
               child: DragTarget<DynamicFormEntity>(
                 onAcceptWithDetails: (details) {
-                  // addWidget(details.data);
-                  context.read<DynamicFormBloc>().add(
-                    AddWidgetEvent(details.data),
-                  );
+                  if (details.data.type == FormType.outlineTextField) {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        final labelWidgetController = TextEditingController();
+                        return AlertDialog(
+                          title: Text("ชื่อหัวข้อ"),
+                          content: TextField(
+                            controller: labelWidgetController,
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Text("ยกเลิก"),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                final newWidget = DynamicFormEntity(
+                                  id: UuidV4().generate(),
+                                  label: labelWidgetController.text,
+                                  type: details.data.type,
+                                  children: [],
+                                );
+                                context.read<DynamicFormBloc>().add(
+                                  AddWidgetEvent(newWidget),
+                                );
+                                Navigator.of(context).pop();
+                              },
+                              child: Text("ตกลง"),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  } else {
+                    context.read<DynamicFormBloc>().add(
+                      AddWidgetEvent(details.data),
+                    );
+                  }
                 },
                 builder: (context, candidateData, rejectedData) {
                   return BlocBuilder<DynamicFormBloc, DynamicFormState>(

@@ -1,1 +1,1 @@
-enum FormType { outlineTextField, row, column }
+enum FormType { outlineTextField, row, column, space }

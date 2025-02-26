@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dynamic_form_poc/data/enitity/dynamic_form_entity.dart';
+import 'package:uuid/v4.dart';
 
 part 'dynamic_form_event.dart';
 part 'dynamic_form_state.dart';
@@ -9,7 +10,16 @@ class DynamicFormBloc extends Bloc<DynamicFormEvent, DynamicFormState> {
 
   DynamicFormBloc() : super(DynamicFormInitial()) {
     on<AddWidgetEvent>((event, emit) {
-      widgets.add(event.newWidget);
+      event.newWidget.id = UuidV4().generate();
+
+      final newWidget = DynamicFormEntity(
+        id: UuidV4().generate(),
+        label: event.newWidget.label,
+        type: event.newWidget.type,
+        children: [],
+      );
+
+      widgets.add(newWidget);
       emit(AddedWidgetState());
     });
 

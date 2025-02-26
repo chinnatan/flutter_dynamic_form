@@ -7,17 +7,48 @@ class DynamicOutlineTextFieldWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (label == "") {
+      return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: SizedBox(
+          width: double.infinity,
+          child: Column(
+            children: [
+              TextField(
+                readOnly: true,
+                canRequestFocus: false,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: SizedBox(
         width: double.infinity,
-        child: TextField(
-          readOnly: true,
-          canRequestFocus: false,
-          decoration: InputDecoration(
-            labelText: label,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-          ),
+        child: Column(
+          children: [
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(label, textAlign: TextAlign.start),
+            ),
+            SizedBox(height: 8),
+            TextField(
+              readOnly: true,
+              canRequestFocus: false,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
